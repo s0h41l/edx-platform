@@ -11,6 +11,7 @@ from web_fragments.fragment import Fragment
 
 from lms.djangoapps.courseware.courses import get_course_date_blocks, get_course_with_access
 from openedx.core.djangoapps.plugin_api.views import EdxFragmentView
+from openedx.features.course_duration_limits.access import generate_course_expired_message
 
 
 class CourseDatesFragmentView(EdxFragmentView):
@@ -25,10 +26,12 @@ class CourseDatesFragmentView(EdxFragmentView):
         """
         course_key = CourseKey.from_string(course_id)
         course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=False)
-        course_date_blocks = get_course_date_blocks(course, request.user)
+        course_date_blocks = get_course_date_blocks(course, request.user, request)
+        FBE_message = generate_course_expired_message(request.user, course)
 
         context = {
-            'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime']
+            'course_date_blocks': [block for block in course_date_blocks if block.title != 'current_datetime'],
+            'FBE_message': FBE_message,
         }
         html = render_to_string(self.template_name, context)
         dates_fragment = Fragment(html)

@@ -13,6 +13,18 @@ from django.utils.translation import ugettext as _
     % for course_date_block in course_date_blocks:
         <%include file="dates-summary.html" args="course_date=course_date_block" />
     % endfor
+    % if FBE_message:
+        <div class="date-summary-container">
+            <div class="date-summary date-summary-fbe-message">
+                <div class="left-column">
+                    <div class="calendar-icon"></div>
+                </div>
+                <div class="right-column">
+                    ${FBE_message}
+                </div>
+            </div>
+        </div>
+    % endif
 % endif
 
 <%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
