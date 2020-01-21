@@ -21,7 +21,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_oauth.authentication import OAuth2Authentication
+from edx_rest_framework_extensions.auth.bearer.authentication import BearerAuthentication
 
 from openedx.core.djangoapps.bookmarks.api import BookmarksLimitReachedError
 from openedx.core.lib.api.permissions import IsUserInUrl
@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 
 # Default error message for user
 DEFAULT_USER_MESSAGE = ugettext_noop(u'An error has occurred. Please try again.')
-
+DEFAULT_AUTHENTICATION_CLASSES = (BearerAuthentication, SessionAuthentication)
 
 class BookmarksPagination(DefaultPagination):
     """
@@ -99,7 +99,7 @@ class BookmarksViewMixin(object):
 class BookmarksListView(ListCreateAPIView, BookmarksViewMixin):
     """REST endpoints for lists of bookmarks."""
 
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = DEFAULT_AUTHENTICATION_CLASSES
     pagination_class = BookmarksPagination
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = BookmarkSerializer
@@ -290,7 +290,7 @@ class BookmarksDetailView(APIView, BookmarksViewMixin):
         to a requesting user's bookmark a 404 is returned. 404 will also be returned
         if the bookmark does not exist.
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = DEFAULT_AUTHENTICATION_CLASSES
     permission_classes = (permissions.IsAuthenticated, IsUserInUrl)
 
     serializer_class = BookmarkSerializer
