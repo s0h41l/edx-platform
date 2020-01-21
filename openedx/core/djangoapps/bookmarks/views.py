@@ -38,6 +38,7 @@ log = logging.getLogger(__name__)
 DEFAULT_USER_MESSAGE = ugettext_noop(u'An error has occurred. Please try again.')
 DEFAULT_AUTHENTICATION_CLASSES = (BearerAuthentication, SessionAuthentication)
 
+
 class BookmarksPagination(DefaultPagination):
     """
     Paginator for bookmarks API.
