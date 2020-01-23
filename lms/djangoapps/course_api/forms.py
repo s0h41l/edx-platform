@@ -27,6 +27,7 @@ class UsernameValidatorMixin(object):
         username = self.cleaned_data.get('username')
         return username or ''
 
+
 class CourseDetailGetForm(UsernameValidatorMixin, Form):
     """
     A form to validate query parameters in the course detail endpoint

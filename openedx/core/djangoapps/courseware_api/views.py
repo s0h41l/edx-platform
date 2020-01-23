@@ -2,10 +2,14 @@
 Course API Views
 """
 
-from opaque_keys.edx.keys import CourseKey
+import json
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from lms.djangoapps.course_api.api import course_detail
+from lms.djangoapps.courseware.module_render import get_module_by_usage_id
 from openedx.core.lib.api.view_utils import DeveloperErrorViewMixin, view_auth_classes
 
 from .serializers import CourseInfoSerializer
@@ -86,3 +90,41 @@ class CoursewareInformation(DeveloperErrorViewMixin, RetrieveAPIView):
         context = super().get_serializer_context()
         context['requested_fields'] = self.request.GET.get('requested_fields', None)
         return context
+
+
+@view_auth_classes(is_authenticated=True)
+class SequenceMetadata(DeveloperErrorViewMixin, APIView):
+    """
+    **Use Cases**
+
+        Request details for a sequence/subsection
+
+    **Example Requests**
+
+        GET /api/courseware/sequence/{usage_key}
+
+    **Response Values**
+
+        Body consists of the following fields:
+            TODO
+
+    **Returns**
+
+        * 200 on success with above fields.
+        * 400 if an invalid parameter was sent.
+        * 403 if a user who does not have permission to masquerade as
+          another user specifies a username other than their own.
+        * 404 if the course is not available or cannot be seen.
+    """
+    def get(self, request, usage_key_string, *args, **kwargs):  # pylint: disable=unused-argument
+        """
+        Return response to a GET request.
+        """
+        usage_key = UsageKey.from_string(usage_key_string)
+
+        sequence, _ = get_module_by_usage_id(
+            self.request,
+            str(usage_key.course_key),
+            str(usage_key),
+            disable_staff_debug_info=True)
+        return Response(json.loads(sequence.handle_ajax('metadata', None)))
